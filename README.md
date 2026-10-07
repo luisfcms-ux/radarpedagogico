@@ -1,17 +1,17 @@
 # Radar Pedagógico
 
-Protótipo de planejamento inclusivo em português brasileiro, construído com JavaScript e Vite. Não usa IA, backend, cadastro de alunos ou serviços externos.
+Aplicativo de planejamento inclusivo em português brasileiro, com as três telas do [wireframe fornecido](docs/wireframe.md). JavaScript, Vite e JSZip; sem servidor de aplicação, IA, chaves de API ou banco de dados.
 
-## Desenvolvimento
+## Executar
 
 Requer Node.js 20.19+ ou 22.12+ (validado com Node 24) e npm.
 
 ```sh
-npm ci --cache /workspace/.npm-cache --no-audit --no-fund
-npm run dev -- --port 5173 --strictPort
+npm ci
+npm run dev
 ```
 
-Em máquinas fora do ambiente cloud, omita a opção `--cache` ou escolha um diretório gravável. O servidor de desenvolvimento escuta em todas as interfaces; não é um servidor de produção.
+Abra o endereço informado pelo Vite no navegador. No ambiente cloud, use um cache gravável: `npm ci --cache /workspace/.npm-cache --no-audit --no-fund`. Para fixar a porta, use `npm run dev -- --port 5173 --strictPort`.
 
 ```sh
 npm test
@@ -19,26 +19,48 @@ npm run build
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-O último comando usa o Chromium instalado no ambiente cloud. Em outra máquina, instale o navegador com `npx playwright install chromium` e rode `npm run test:e2e` sem a variável. O download depende do acesso aos domínios oficiais do Playwright.
+Os testes de navegador usam o Chromium disponível na imagem cloud. Em outra máquina, execute `npx playwright install chromium` e `npm run test:e2e` sem a variável. O download depende de acesso aos domínios oficiais do Playwright.
 
-Para conferir a versão compilada: `npm run preview -- --port 4173 --strictPort`. O diretório `dist/` pode ser servido por hospedagem estática. A publicação do código no GitHub não publica um site.
+Para conferir a versão compilada: `npm run preview -- --port 4173 --strictPort`. A hospedagem estática deve executar `npm run build` e publicar `dist/`. Vercel e Netlify reconhecem Vite. Não é necessário configurar banco de dados nem variáveis. O push para o GitHub não publica um site automaticamente, mas uma hospedagem já conectada à branch `main` pode fazer novo deploy a cada push.
 
-## Fluxo
+## As três telas
 
-1. Preencha turma, componente, duração, habilidade, objetivos e os três momentos da aula. Escola, professor, data, conteúdos, recursos, avaliação e referências são opcionais. Os tempos das atividades são texto livre; não há validação automática da soma.
-2. Selecione barreiras observadas, necessidades de participação e recursos disponíveis. É possível seguir sem adaptações. Não é necessário registrar diagnósticos ou identificar estudantes.
-3. Revise cada sugestão, edite seu texto ou desmarque sua inclusão. Monte o plano, faça edições livres e copie ou imprima. O diálogo de impressão do navegador permite salvar como PDF.
+### 1. Criador de planos de aula
 
-O plano preserva a habilidade informada pelo professor. O sistema não cria nem valida códigos BNCC. Todas as 14 regras estão em `src/rules.js`: cada seleção ativa uma orientação explícita, exibida com sua origem. As regras não diagnosticam estudantes, não substituem avaliação pedagógica e não alteram automaticamente os objetivos curriculares.
+- Identificação: escola, ano de 1º a 5º, turma, componente curricular, docente, data e duração.
+- Alinhamento: campo de atuação, práticas de linguagem, objeto de conhecimento, habilidades da BNCC, matriz SAEB/estadual, gênero e fundamentação, dificuldades antecipadas.
+- Objetivos: geral, lista dinâmica de específicos e conteúdo programático.
+- Metodologia: tempo numérico e ação do professor/alunos em introdução, desenvolvimento e fechamento. A soma dos momentos é validada contra a duração.
+- Recursos, instrumentos/critérios de avaliação e referências.
 
-A montagem do plano é uma ação explícita. Alterações em seleções ou sugestões só entram no texto final ao clicar em **Atualizar plano com sugestões revisadas**. Essa ação substitui as edições livres do texto final, conforme aviso na interface. Edições de sugestões mantidas são preservadas ao voltar entre etapas.
+A habilidade curricular é transcrita do que o professor informa. Não há criação ou validação de códigos BNCC.
 
-## Rascunho e limites
+### 2. Central de acessibilidade e inclusão
 
-Salvar, carregar e excluir rascunho são ações explícitas. Um único rascunho fica no `localStorage` deste navegador, sem envio ao servidor. Recarregar a página exige clicar em Carregar rascunho. Evite dados pessoais e sensíveis, especialmente em equipamentos compartilhados. A exclusão remove o rascunho salvo, mas mantém o plano aberto.
+As 16 categorias do wireframe estão organizadas em seis grupos, com suporte/comunicação do TEA, predominância do TDAH, especificações motoras e áreas de altas habilidades. Os cinco recursos assistivos podem ser combinados. As categorias organizam orientações; não diagnosticam estudantes nem inferem apoios a partir de um rótulo. Os níveis e detalhes fornecidos aparecem na origem da regra, sem definir automaticamente a estratégia.
 
-Esta versão oferece impressão/PDF pelo navegador, não exportação Word, geração de kits ZIP, vinculação a PI ou histórico de alunos. Essas funções do wireframe não são simuladas.
+A lista de classe aceita identificadores locais (preferencialmente apelidos ou códigos). O professor pode selecionar um identificador e registrar observações de compatibilização com o PI. Não há conexão com PI, cadastro ou histórico de uma instituição externa.
+
+### 3. Visualizador do plano final
+
+Duas colunas permitem consultar objetivos e fluxo do plano regular enquanto o professor navega nas abas de cada necessidade. A coluna regular permanece fixa durante a comparação em telas maiores. Cada aba possui objetivos flexibilizados e manejo em introdução, desenvolvimento e fechamento, além da origem explícita da regra. As sugestões são editáveis e podem ser recusadas. As regras estão em `src/rules.js`.
+
+O plano completo admite edição livre. Alterações nas sugestões precisam ser incorporadas com **Atualizar Plano com Adaptações Revisadas** antes da exportação ou salvamento no histórico. A atualização substitui a edição livre do texto final; o aplicativo pede confirmação se houver edições manuais.
+
+Ações disponíveis:
+
+- Copiar o plano completo.
+- Exportar PDF pelo diálogo de impressão do navegador ou baixar Word `.docx` real (Office Open XML).
+- Baixar cartões de sentimentos como HTML imprimível e texto informado pelo professor com fonte de 24 px e alto contraste.
+- Baixar ZIP com os dois modelos de apoio e instruções. São modelos gerais para revisão docente, sem geração por IA ou promessa de adaptação individual automática.
+- Salvar rascunho e múltiplos planos no histórico local, pesquisar, reabrir e excluir.
+
+## Persistência e cuidados
+
+Planos, lista de classe e histórico ficam no `localStorage`, apenas no navegador e na origem em que o aplicativo foi aberto. Nada é enviado a serviços externos. Os dados não sincronizam entre aparelhos, podem ser apagados ao limpar os dados do navegador e não são um arquivo institucional. Prefira identificadores sem dados pessoais; baixe os documentos que precisa guardar. Não há salvamento automático: clique em Salvar Rascunho ou Salvar no Histórico. A navegação para o início mantém o plano aberto; criar um novo plano pede confirmação antes de descartar o conteúdo.
+
+Rascunhos da primeira versão continuam disponíveis para importação. Os campos antigos são preservados, e o formulário abre na primeira etapa para complementar os novos campos. As antigas sugestões não são convertidas silenciosamente para categorias diferentes. A antiga cópia permanece armazenada até a exclusão explícita do rascunho.
 
 ## Validação
 
-Os testes unitários verificam a seleção das regras, preservação da habilidade curricular e exclusão de sugestões recusadas. Os testes de navegador exercitam validação dos campos, revisão e edição, cópia, persistência, impressão, navegação de retorno, fluxo sem adaptações, largura móvel e renderização segura de texto inserido pelo usuário.
+Testes unitários verificam o catálogo completo, a origem das regras, campos curriculares, exclusão de sugestões, conteúdo real de DOCX/ZIP e escape de texto nos materiais. Testes de navegador validam as três telas, tempos da aula, abas, edições, exportações, histórico, rascunho e layout móvel.
