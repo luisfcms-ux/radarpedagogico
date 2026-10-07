@@ -1,0 +1,5 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {groups,suggestions,composePlan} from '../src/rules.js';
+test('only selected rules are suggested, with traceable labels',()=>{const result=suggestions(['leitura','registro']);assert.deepEqual(result.map(r=>r.id),['leitura','registro']);assert.ok(result.every(r=>r.text&&r.label&&r.accepted));assert.equal(suggestions([]).length,0);assert.equal(new Set(groups.flatMap(g=>g.items.map(i=>i[0]))).size,14);});
+test('final plan preserves curricular text and excludes rejected suggestions',()=>{const rules=suggestions(['leitura','visual']);rules[0].accepted=false;rules[1].text='Material revisado pelo professor';const plan=composePlan({classroom:'3º B',skill:'Habilidade colada da fonte oficial',objectives:'Compreender um texto'},rules,'Tempo adicional');assert.ok(plan.includes('Habilidade colada da fonte oficial'));assert.ok(plan.includes('Material revisado pelo professor'));assert.ok(!plan.includes(rules[0].text));assert.ok(plan.includes('Tempo adicional'));assert.ok(!plan.includes('EF15'));});
